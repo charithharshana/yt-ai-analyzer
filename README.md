@@ -15,6 +15,10 @@ A powerful Chrome extension that provides AI-powered analysis of YouTube videos 
 - **🌟 Favorite Models**: Mark your preferred AI models for quick access
 - **📋 Multiple Analysis Types**: Full Video Brief, Longer Video Brief, and custom prompts
 
+[![Watch the video](https://img.youtube.com/vi/qnbbILwU__0/maxresdefault.jpg)](https://youtu.be/qnbbILwU__0)
+
+### [How to Use](https://youtu.be/qnbbILwU__0)
+
 ## 🚀 Quick Start
 
 ### 1. Installation
@@ -29,8 +33,6 @@ A powerful Chrome extension that provides AI-powered analysis of YouTube videos 
 3. **Enable Developer Mode** (toggle in top right corner)
 4. **Click "Load unpacked"** and select the extension folder
 5. The extension icon should now appear in your Chrome toolbar
-
-How to Use- https://youtu.be/qnbbILwU__0
 
 ### 2. Get Your API Key
 
