@@ -30,6 +30,8 @@ A powerful Chrome extension that provides AI-powered analysis of YouTube videos 
 4. **Click "Load unpacked"** and select the extension folder
 5. The extension icon should now appear in your Chrome toolbar
 
+How to Use- https://youtu.be/qnbbILwU__0
+
 ### 2. Get Your API Key
 
 1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
