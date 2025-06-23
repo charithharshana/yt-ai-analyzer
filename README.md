@@ -57,7 +57,7 @@ A powerful Chrome extension that provides AI-powered analysis of YouTube videos 
 ## 📖 How to Use
 
 ### Method 1: Analyze Individual Videos
-1. **Go to any YouTube video** (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+1. **Go to any YouTube video** (e.g., [https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://youtu.be/qnbbILwU__0))
 2. **Look for the purple "AI Analyze" button** below the video player
 3. **Click the button** to start analysis
 4. **Wait for the AI analysis** to complete (usually 10-30 seconds)
