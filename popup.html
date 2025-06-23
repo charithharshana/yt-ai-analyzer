@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube AI Analyzer</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header -->
+        <header class="popup-header">
+            <div class="logo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <h1>YouTube AI Analyzer</h1>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="popup-content">
+            <!-- Status Section -->
+            <div class="status-section">
+                <div id="statusIndicator" class="status-indicator">
+                    <div class="status-icon">📊</div>
+                    <div class="status-text">
+                        <h3 id="statusTitle">Ready to Analyze</h3>
+                        <p id="statusDescription">Navigate to a YouTube video and click the AI Analyze button</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="actions-section">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <button id="openYouTubeBtn" class="action-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136C4.495 20.455 12 20.455 12 20.455s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        Open YouTube
+                    </button>
+                    
+                    <button id="settingsBtn" class="action-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                        </svg>
+                        Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <h3>Features</h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-text">
+                            <h4>AI-Powered Analysis</h4>
+                            <p>Get comprehensive video summaries using Google Gemini AI</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">⏰</div>
+                        <div class="feature-text">
+                            <h4>Clickable Timestamps</h4>
+                            <p>Jump to specific moments with timestamp navigation</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🔑</div>
+                        <div class="feature-text">
+                            <h4>Key Points Extraction</h4>
+                            <p>Identify and highlight the most important content</p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-text">
+                            <h4>Topic Analysis</h4>
+                            <p>Categorize and organize video content by topics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Info -->
+            <div class="settings-info">
+                <div class="info-item">
+                    <span class="info-label">Model:</span>
+                    <span id="currentModel" class="info-value">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">API Keys:</span>
+                    <span id="apiKeyCount" class="info-value">Loading...</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="popup-footer">
+            <p>Navigate to YouTube and click "AI Analyze" below any video</p>
+        </footer>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

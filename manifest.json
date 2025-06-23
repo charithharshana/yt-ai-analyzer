@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube AI Video Analyzer",
+  "version": "1.0.0",
+  "description": "AI-powered video analysis for YouTube with Gemini API integration",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://youtube.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://www.googleapis.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://www.youtube.com/", "https://www.youtube.com/?*"],
+      "js": ["home-content.js"],
+      "css": ["home-content.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube AI Analyzer",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*", "utils.js"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ]
+}

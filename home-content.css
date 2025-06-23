@@ -1,0 +1,131 @@
+/* Home page video analyze button styles for YouTube AI Video Analyzer */
+
+.yt-video-analyze-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  position: absolute;
+  z-index: 100;
+  opacity: 0.9;
+}
+
+.yt-video-analyze-btn:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.6);
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.yt-video-analyze-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.yt-home-analyzer-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+  position: relative;
+}
+
+.yt-home-analyzer-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.yt-home-analyzer-btn span {
+  white-space: nowrap;
+}
+
+/* Fixed position container styles */
+#yt-home-analyzer-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .yt-home-analyzer-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .yt-home-analyzer-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  #yt-home-analyzer-container {
+    top: 15px;
+    right: 15px;
+  }
+}
+
+/* Integration with YouTube's masthead */
+ytd-masthead #end .yt-home-analyzer-btn,
+#masthead #end .yt-home-analyzer-btn {
+  margin-left: 8px;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .yt-home-analyzer-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+  }
+  
+  .yt-home-analyzer-btn:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  }
+}
+
+/* Animation for button appearance */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.yt-home-analyzer-btn {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+/* Ensure button doesn't interfere with YouTube's layout */
+.yt-home-analyzer-btn {
+  flex-shrink: 0;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .yt-home-analyzer-btn {
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+  }
+  
+  .yt-home-analyzer-btn:hover {
+    background: #333;
+  }
+}

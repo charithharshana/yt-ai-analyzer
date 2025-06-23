@@ -1,0 +1,270 @@
+/* Popup styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 350px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #333;
+}
+
+.popup-container {
+  background: white;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.popup-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.logo h1 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Main Content */
+.popup-content {
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Status Section */
+.status-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #667eea;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-icon {
+  font-size: 1.5rem;
+}
+
+.status-text h3 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+.status-text p {
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Actions Section */
+.actions-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.action-btn:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+  transform: translateY(-1px);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.action-btn svg {
+  color: #667eea;
+}
+
+/* Features Section */
+.features-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.feature-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.feature-text h4 {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.feature-text p {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Settings Info */
+.settings-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Footer */
+.popup-footer {
+  background: #f8f9fa;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border-top: 1px solid #e1e5e9;
+}
+
+.popup-footer p {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Status variations */
+.status-indicator.success .status-icon {
+  color: #4CAF50;
+}
+
+.status-indicator.warning .status-icon {
+  color: #FF9800;
+}
+
+.status-indicator.error .status-icon {
+  color: #f44336;
+}
+
+.status-indicator.success {
+  border-left-color: #4CAF50;
+}
+
+.status-indicator.warning {
+  border-left-color: #FF9800;
+}
+
+.status-indicator.error {
+  border-left-color: #f44336;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
