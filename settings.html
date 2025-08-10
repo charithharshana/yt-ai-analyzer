@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube AI Analyzer - Settings</title>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div class="settings-container">
+        <!-- Header -->
+        <header class="settings-header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <h1>YouTube AI Analyzer Settings</h1>
+                </div>
+                <button id="closeBtn" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    Close
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="settings-content">
+            <!-- Status Card -->
+            <div class="status-card">
+                <div id="statusIndicator" class="status-indicator">
+                    <div class="status-icon">⚙️</div>
+                    <div class="status-text">
+                        <h3 id="statusTitle">Configuration Status</h3>
+                        <p id="statusDescription">Configure your settings below</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Form -->
+            <form id="settingsForm" class="settings-form">
+                <!-- AI Model Selection -->
+                <div class="setting-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V14L17.25,10.5L11,6Z"/>
+                        </svg>
+                        AI Model Configuration
+                    </h2>
+                    <p class="section-description">Choose the Gemini AI model for video analysis</p>
+                    
+                    <div class="form-group">
+                        <label for="modelSelect">Selected Model:</label>
+                        <select id="modelSelect" class="form-control" required>
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <small class="help-text">Flash models are faster, Pro models provide more detailed analysis</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Add Custom Model:</label>
+                        <div class="simple-model-form">
+                            <input type="text" id="quickModelId" class="form-control" placeholder="Model ID (e.g., gemini-1.5-pro)" style="margin-bottom: 0.5rem;">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" id="quickAddModelBtn" class="btn btn-outline btn-small">Add Model</button>
+                                <button type="button" id="refreshModelsBtn" class="btn btn-secondary btn-small">Refresh List</button>
+                            </div>
+                        </div>
+                        <small class="help-text">Enter a Gemini model ID to add it to your list. Default models are always available.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Manage Models:</label>
+                        <div class="simple-model-list" id="simpleModelList">
+                            <!-- Model items will be populated by JavaScript -->
+                        </div>
+                        <small class="help-text">★/☆ = Toggle favorite, ✏️ = Edit (display name for default models, model ID for custom models), 🗑️ = Remove (custom models only)</small>
+                    </div>
+                </div>
+
+                <!-- API Keys Configuration -->
+                <div class="setting-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,14A3,3 0 0,1 10,17A3,3 0 0,1 7,20A3,3 0 0,1 4,17A3,3 0 0,1 7,14M12.65,10C11.83,7.67 9.61,6 7,6A6,6 0 0,0 1,12A6,6 0 0,0 7,18C9.61,18 11.83,16.33 12.65,14H17V18H21V14H23V10H12.65Z"/>
+                        </svg>
+                        API Keys Management
+                    </h2>
+                    <p class="section-description">Configure your Google API keys for video analysis and transcript extraction</p>
+
+                    <div class="form-group">
+                        <label for="geminiApiKeysTextarea">Gemini API Keys (one per line):</label>
+                        <textarea
+                            id="geminiApiKeysTextarea"
+                            class="form-control"
+                            rows="4"
+                            placeholder="AIzaSyExample1234567890abcdef&#10;AIzaSyExample0987654321fedcba"
+                            required
+                        ></textarea>
+                        <small class="help-text">
+                            Enter multiple Gemini API keys to avoid rate limits. Get your keys from
+                            <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a>
+                        </small>
+                    </div>
+
+
+
+                    <div class="api-key-info">
+                        <div class="info-item">
+                            <span class="info-label">Gemini Keys:</span>
+                            <span id="geminiKeyCount" class="info-value">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Rotation:</span>
+                            <span class="info-value">Automatic</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prompt Management -->
+                <div class="setting-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        </svg>
+                        Analysis Prompts
+                    </h2>
+                    <p class="section-description">Manage your AI analysis prompts with custom variables like {transcript}, {title}, {description}</p>
+
+                    <div class="form-group">
+                        <label for="promptSelect">Active Prompt:</label>
+                        <div class="prompt-selector">
+                            <select id="promptSelect" class="form-control">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                            <button type="button" id="addPromptBtn" class="btn btn-outline btn-small">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                                </svg>
+                                Add New
+                            </button>
+                        </div>
+                        <small class="help-text">Select the prompt template to use for video analysis</small>
+                    </div>
+
+                    <div class="prompt-list" id="promptList">
+                        <!-- Prompt items will be populated by JavaScript -->
+                    </div>
+
+                    <div class="prompt-variables-info">
+                        <h4>Available Variables:</h4>
+                        <div class="variables-grid">
+                            <div class="variable-item">
+                                <code>{transcript}</code>
+                                <span>Full video transcript with timestamps</span>
+                            </div>
+                            <div class="variable-item">
+                                <code>{title}</code>
+                                <span>Video title</span>
+                            </div>
+                            <div class="variable-item">
+                                <code>{description}</code>
+                                <span>Video description</span>
+                            </div>
+                            <div class="variable-item">
+                                <code>{videoUrl}</code>
+                                <span>YouTube video URL</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="setting-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+                        </svg>
+                        Advanced Options
+                    </h2>
+                    <p class="section-description">Fine-tune the analyzer behavior</p>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="autoAnalyze" class="checkbox">
+                                <span class="checkmark"></span>
+                                Auto-analyze videos when page loads
+                            </label>
+                        </div>
+                        <small class="help-text">Automatically start analysis when visiting YouTube videos</small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="openVideoInNewTab" class="checkbox">
+                                <span class="checkmark"></span>
+                                Open videos in new tab (Home page button)
+                            </label>
+                        </div>
+                        <small class="help-text">When using the Quick Analyze button on YouTube home page, open videos in a new tab instead of current tab</small>
+                    </div>
+
+
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                        </svg>
+                        Save Settings
+                    </button>
+                    
+                    <button type="button" id="testBtn" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V14L17.25,10.5L11,6Z"/>
+                        </svg>
+                        Test Configuration
+                    </button>
+                    
+                    <button type="button" id="resetBtn" class="btn btn-outline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.5L7,5.5L12,0.5V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z"/>
+                        </svg>
+                        Reset to Defaults
+                    </button>
+                </div>
+            </form>
+
+            <!-- Help Section -->
+            <div class="help-section">
+                <h3>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11,18H13V16H11V18M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C7.59,4 4,12A10,10 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,6A4,4 0 0,0 8,10H10A2,2 0 0,1 12,8A2,2 0 0,1 14,10C14,12 11,11.75 11,15H13C13,12.75 16,12.5 16,10A4,4 0 0,0 12,6Z"/>
+                    </svg>
+                    Need Help?
+                </h3>
+                <div class="help-content">
+                    <div class="help-item">
+                        <h4>Getting API Keys</h4>
+                        <p>Visit <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a> to create your free Gemini API keys.</p>
+                    </div>
+                    <div class="help-item">
+                        <h4>Multiple Keys</h4>
+                        <p>Add multiple API keys to automatically rotate between them and avoid rate limits.</p>
+                    </div>
+                    <div class="help-item">
+                        <h4>Model Selection</h4>
+                        <p>Flash models are faster and cheaper, while Pro models provide more detailed analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+
+    <!-- Prompt Editor Modal -->
+    <div id="promptModal" class="modal" style="display: none;" onclick="handleModalClick(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Prompt</h3>
+                <button type="button" class="modal-close" id="modalCloseBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="promptForm">
+                    <div class="form-group">
+                        <label for="promptName">Prompt Name:</label>
+                        <input type="text" id="promptName" class="form-control" placeholder="Enter prompt name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="promptText">Prompt Template:</label>
+                        <textarea id="promptText" class="form-control" rows="12" placeholder="Enter your prompt template here. Use variables like {transcript}, {title}, {description}, {videoUrl}" required></textarea>
+                        <small class="help-text">Use variables in curly braces: {transcript}, {title}, {description}, {videoUrl}</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="modalSaveBtn">Save Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+</body>
+</html>
