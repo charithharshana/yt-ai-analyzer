@@ -216,6 +216,7 @@ Note: This analysis is performed using the video URL directly. The AI will analy
     }
   }
 
+
   async makeGeminiRequest(model, prompt, retryCount = 0) {
     const maxRetries = 3;
 
@@ -368,6 +369,7 @@ Note: This analysis is performed using the video URL directly. The AI will analy
       throw error;
     }
   }
+
 
   parseRawAnalysisResponse(response) {
     try {
@@ -625,6 +627,7 @@ class BackgroundService {
           }
           break;
 
+
         case 'chatWithVideo':
           try {
             const chatReply = await this.chatWithVideo(request.message, request.videoId, request.videoUrl);
@@ -868,6 +871,7 @@ class BackgroundService {
       throw new Error('Failed to analyze video by link: ' + error.message);
     }
   }
+
 
   async chatWithVideo(userMessage, videoId, videoUrl) {
     try {

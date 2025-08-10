@@ -5,7 +5,6 @@
   margin-left: 12px;
   margin-right: 8px;
 }
-
 .yt-ai-analyzer-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
@@ -15,6 +14,7 @@
   font-family: "YouTube Sans", "Roboto", sans-serif;
   font-size: 14px;
   font-weight: 500;
+
   padding: 8px 16px;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -68,6 +68,7 @@
 .yt-ai-analyzer-container:hover .dropdown-arrow {
   opacity: 1;
 }
+
 
 .yt-ai-analyzer-btn.loading {
   pointer-events: none;
@@ -176,6 +177,7 @@
   color: #666;
   line-height: 1.3;
 }
+
 
 
 
