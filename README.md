@@ -5,7 +5,9 @@ A powerful Chrome extension that provides AI-powered analysis of YouTube videos 
 ## ✨ Features
 
 - **🤖 AI-Powered Analysis**: Get comprehensive video summaries using Google Gemini AI
+- **🔗 Video Link Method**: Send video URL directly to AI for comprehensive analysis (NEW!)
 - **📝 Smart Transcript Extraction**: Automatically extracts and analyzes video transcripts when available
+- **⚙️ Dual Analysis Methods**: Choose between transcript extraction or direct video URL analysis
 - **⏰ Clickable Timestamps**: Jump to specific moments with timestamp navigation
 - **🎯 Key Points Extraction**: Identify and highlight the most important content
 - **🔄 Multiple API Key Support**: Rotate between multiple API keys to avoid rate limits
@@ -56,12 +58,15 @@ A powerful Chrome extension that provides AI-powered analysis of YouTube videos 
 
 ## 📖 How to Use
 
-### Method 1: Analyze Individual Videos
+### Method 1: Analyze Individual Videos (Two Options)
 1. **Go to any YouTube video** (e.g., [https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://youtu.be/qnbbILwU__0))
 2. **Look for the purple "AI Analyze" button** below the video player
-3. **Click the button** to start analysis
-4. **Wait for the AI analysis** to complete (usually 10-30 seconds)
-5. **Review the comprehensive analysis** with clickable timestamps
+3. **Choose your analysis method:**
+   - **📝 Transcript Method**: Extracts and analyzes video transcript (traditional method)
+   - **🔗 Video Link Method**: Sends video URL directly to AI for comprehensive analysis
+4. **Click your preferred method** to start analysis
+5. **Wait for the AI analysis** to complete (usually 10-30 seconds)
+6. **Review the comprehensive analysis** with clickable timestamps
 
 ### Method 2: Analyze from YouTube Homepage
 1. **Visit YouTube homepage** (https://www.youtube.com/)
@@ -74,6 +79,17 @@ A powerful Chrome extension that provides AI-powered analysis of YouTube videos 
 2. **Visit any YouTube video**
 3. **Analysis starts automatically** after page loads
 4. **Perfect for hands-free analysis**
+
+## 🔄 Analysis Methods Comparison
+
+| Method | Speed | Accuracy | Best For | Requirements |
+|--------|-------|----------|----------|-------------|
+| **📝 Transcript Method** | Fast | High | Videos with good captions | Video must have transcript/captions |
+| **🔗 Video Link Method** | Medium | Very High | All videos, including those without captions | Works with any YouTube video |
+
+### When to Use Each Method:
+- **Use Transcript Method** when you want fast analysis and the video has good quality captions
+- **Use Video Link Method** when the video lacks captions, has poor transcript quality, or you want the most comprehensive analysis including visual elements
 
 ## 🎯 What You Get
 
