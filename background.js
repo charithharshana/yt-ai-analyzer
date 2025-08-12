@@ -9,8 +9,13 @@ class GeminiAPI {
   }
 
   async getSettings() {
-    const result = await chrome.storage.sync.get(['settings']);
-    return result.settings || {
+    // Get settings from sync storage and prompts from local storage
+    const [syncResult, localResult] = await Promise.all([
+      chrome.storage.sync.get(['settings']),
+      chrome.storage.local.get(['prompts'])
+    ]);
+    
+    const defaultSettings = {
       apiKeys: [],
       geminiApiKeys: [],
       youtubeApiKey: '',
@@ -48,8 +53,17 @@ class GeminiAPI {
           description: 'Lightweight Flash model',
           isFavorite: false
         }
-      ]
+      ],
+      prompts: []
     };
+    
+    const settings = syncResult.settings || defaultSettings;
+    
+    // Get prompts from local storage
+    const prompts = localResult.prompts || [];
+    settings.prompts = prompts;
+    
+    return settings;
   }
 
   async getNextApiKey() {
@@ -70,9 +84,9 @@ class GeminiAPI {
     const settings = await this.getSettings();
     const model = settings.selectedModel;
 
-    // Get the selected prompt template
-    const selectedPromptId = settings.selectedPromptId || 'full_brief';
-    const selectedPrompt = settings.prompts.find(p => p.id === selectedPromptId) || settings.prompts[0];
+    // Get the method-specific prompt template, fallback to global selected prompt
+    const methodPromptId = settings.methodSpecificPrompts?.transcript || settings.selectedPromptId || 'full_brief';
+    const selectedPrompt = settings.prompts.find(p => p.id === methodPromptId) || settings.prompts[0];
 
     if (!selectedPrompt) {
       throw new Error('No analysis prompt configured. Please check your settings.');
@@ -169,9 +183,9 @@ Note: No transcript was available for this video. Please provide an analysis bas
     const settings = await this.getSettings();
     const model = settings.selectedModel;
 
-    // Get the selected prompt template
-    const selectedPromptId = settings.selectedPromptId || 'full_brief';
-    const selectedPrompt = settings.prompts.find(p => p.id === selectedPromptId) || settings.prompts[0];
+    // Get the method-specific prompt template, fallback to global selected prompt
+    const methodPromptId = settings.methodSpecificPrompts?.videolink || settings.selectedPromptId || 'full_brief';
+    const selectedPrompt = settings.prompts.find(p => p.id === methodPromptId) || settings.prompts[0];
 
     if (!selectedPrompt) {
       throw new Error('No analysis prompt configured. Please check your settings.');
@@ -216,6 +230,57 @@ Note: This analysis is performed using the video URL directly. The AI will analy
     }
   }
 
+  async analyzeVideoTranscriptLink(videoData) {
+    const settings = await this.getSettings();
+    const model = settings.selectedModel;
+
+    // Get the method-specific prompt template, fallback to global selected prompt
+    const methodPromptId = settings.methodSpecificPrompts?.transcriptlink || settings.selectedPromptId || 'full_brief';
+    const selectedPrompt = settings.prompts.find(p => p.id === methodPromptId) || settings.prompts[0];
+
+    if (!selectedPrompt) {
+      throw new Error('No analysis prompt configured. Please check your settings.');
+    }
+
+    // Create prompt using the selected template
+    let prompt = selectedPrompt.prompt;
+
+    // Replace variables in the prompt
+    prompt = prompt.replace(/\{title\}/g, videoData.title || 'Unknown Title');
+    prompt = prompt.replace(/\{description\}/g, videoData.description || 'No description available');
+    prompt = prompt.replace(/\{videoUrl\}/g, videoData.videoUrl || '');
+    prompt = prompt.replace(/\{transcript\}/g, videoData.transcript || 'No transcript available');
+
+    // Add video metadata to the prompt
+    prompt += `
+
+Video Title: ${videoData.title}
+Video Description: ${videoData.description}
+Video URL: ${videoData.videoUrl}
+
+Note: This analysis combines both the video transcript and direct video URL access for comprehensive analysis.`;
+
+    try {
+      console.log('=== GEMINI API TRANSCRIPT + LINK DEBUG ===');
+      console.log('Using transcript + link method for:', videoData.videoUrl);
+      console.log('Transcript length:', videoData.transcript ? videoData.transcript.length : 0);
+      console.log('Prompt length:', prompt.length);
+      console.log('=== END TRANSCRIPT + LINK DEBUG ===');
+
+      const response = await this.makeGeminiRequestWithVideoUrl(model, prompt, videoData.videoUrl);
+
+      console.log('=== GEMINI API TRANSCRIPT + LINK RESPONSE ===');
+      console.log('Response length:', response.length);
+      console.log('Contains timestamps:', /\d{1,2}:\d{2}/.test(response));
+      console.log('First 300 chars of response:', response.substring(0, 300));
+      console.log('=== END TRANSCRIPT + LINK RESPONSE DEBUG ===');
+
+      return this.parseRawAnalysisResponse(response);
+    } catch (error) {
+      console.error('Gemini API transcript + link error:', error);
+      throw new Error('Failed to analyze video with transcript + link: ' + error.message);
+    }
+  }
 
   async makeGeminiRequest(model, prompt, retryCount = 0) {
     const maxRetries = 3;
@@ -599,6 +664,9 @@ class BackgroundService {
     chrome.runtime.onInstalled.addListener(() => {
       this.onInstalled();
     });
+    
+    // Run migration on startup to handle extension updates
+    this.migratePromptsToLocalStorage();
   }
 
   async handleMessage(request, sender, sendResponse) {
@@ -627,6 +695,14 @@ class BackgroundService {
           }
           break;
 
+        case 'analyzeVideoTranscriptLink':
+          try {
+            const transcriptLinkAnalysis = await this.analyzeVideoTranscriptLink(request.videoId, request.videoUrl, request.transcriptData, request.videoTitle, request.videoDescription);
+            sendResponse({ success: true, analysis: transcriptLinkAnalysis });
+          } catch (error) {
+            sendResponse({ success: false, error: error.message });
+          }
+          break;
 
         case 'chatWithVideo':
           try {
@@ -872,6 +948,61 @@ class BackgroundService {
     }
   }
 
+  async analyzeVideoTranscriptLink(videoId, videoUrl, transcriptData, videoTitle, videoDescription) {
+    try {
+      console.log(`Starting transcript + link analysis for video ${videoId}...`);
+
+      // Format transcript data from content script
+      const formattedTranscript = this.formatContentScriptTranscript(transcriptData);
+
+      // Create video data object for transcript + link analysis
+      const videoData = {
+        videoId,
+        videoUrl,
+        title: videoTitle || 'Unknown Title',
+        description: videoDescription || 'No description available',
+        transcript: formattedTranscript,
+        hasTranscript: true,
+        extractionMethod: 'transcript-link',
+        videoTitle: videoTitle,
+        videoDescription: videoDescription
+      };
+
+      console.log('Transcript + link data prepared:', {
+        hasTitle: !!videoData.videoTitle,
+        hasDescription: !!videoData.videoDescription,
+        hasTranscript: !!videoData.transcript,
+        transcriptLength: videoData.transcript ? videoData.transcript.length : 0,
+        videoUrl: videoData.videoUrl,
+        extractionMethod: videoData.extractionMethod
+      });
+
+      // Generate AI analysis using Gemini with both transcript and video URL
+      const analysis = await this.geminiAPI.analyzeVideoTranscriptLink(videoData);
+
+      // Include video metadata in the analysis result
+      analysis.videoTitle = videoData.videoTitle;
+      analysis.videoDescription = videoData.videoDescription;
+      analysis.extractionMethod = videoData.extractionMethod;
+
+      // Store analysis result and transcript for potential future use
+      await chrome.storage.local.set({
+        [`transcript_${videoId}`]: formattedTranscript,
+        [`analysis_result_${videoId}`]: {
+          rawAnalysis: analysis.rawAnalysis,
+          isRawFormat: analysis.isRawFormat,
+          timestamp: Date.now(),
+          method: 'transcript-link'
+        }
+      });
+
+      console.log('Transcript + link analysis completed successfully');
+      return analysis;
+    } catch (error) {
+      console.error('Transcript + link analysis error:', error);
+      throw new Error('Failed to analyze video with transcript + link: ' + error.message);
+    }
+  }
 
   async chatWithVideo(userMessage, videoId, videoUrl) {
     try {
@@ -1385,18 +1516,67 @@ HH:MM:SS - HH:MM:SS | [Concept/Heading]: [Brief explanation of what is discussed
           prompt: defaultPrompt,
           isDefault: true,
           createdAt: Date.now()
+        },
+        {
+          id: 'detailed_walkthrough',
+          name: 'Detailed Video Walkthrough',
+          prompt: `You are an expert video summarizer and content creator. Your task is to provide a detailed, well-formatted, and easy-to-understand summary of the given video transcript, with precise timestamps for key points. Each timestamp should correspond to a specific visual or auditory event in the video, making it suitable for a step-by-step walkthrough article where each timestamp corresponds to a screenshot.
+
+**Video Title:** {title}
+**Video URL:** {videoUrl}
+
+**Video Transcript with Timestamps:**
+{transcript}
+
+---
+
+**Please provide a detailed summary of the video based on the transcript, following these guidelines:**
+
+1. **Introduction:** Start with a brief overview of the video's main topic and purpose.
+2. **Key Points with Timestamps (mm:ss format):**
+   * Break down the video into its core sections and individual steps.
+   * For each significant point, identify the **exact timestamp** (mm:ss) from the transcript where that point is introduced or visually represented.
+   * Describe the content at each timestamp concisely but informatively, as if it were accompanying a screenshot in an article.
+   * Use bullet points for readability.
+3. **Visual Cues/Actions:** Include brief descriptions of what is being shown or done on screen at each timestamp, especially for practical demonstrations or important visuals.
+4. **Clarity and Flow:** Ensure the summary flows logically and is easy to follow, even for someone who hasn't watched the video.
+5. **Conciseness:** While detailed, avoid unnecessary jargon or overly long sentences.
+6. **Conclusion:** Briefly summarize the overall outcome or main takeaway.`,
+          isDefault: true,
+          createdAt: Date.now()
         }
       ],
-      selectedPromptId: 'full_brief'
+      selectedPromptId: 'full_brief',
+      methodSpecificPrompts: {
+        transcript: 'full_brief',
+        videolink: 'full_brief',
+        transcriptlink: 'full_brief'
+      }
     };
 
-    const result = await chrome.storage.sync.get(['settings']);
-    const settings = result.settings || defaultSettings;
+    // Get settings from sync storage and prompts from local storage
+    const [syncResult, localResult] = await Promise.all([
+      chrome.storage.sync.get(['settings']),
+      chrome.storage.local.get(['prompts'])
+    ]);
+    
+    const settings = syncResult.settings || defaultSettings;
+    
+    // Get prompts from local storage, fallback to default if not found
+    const prompts = localResult.prompts || defaultSettings.prompts;
+    settings.prompts = prompts;
 
     // Ensure prompts array exists and has default prompt
     if (!settings.prompts || settings.prompts.length === 0) {
       settings.prompts = defaultSettings.prompts;
       settings.selectedPromptId = 'full_brief';
+      // Save default prompts to local storage
+      await chrome.storage.local.set({ prompts: defaultSettings.prompts });
+    }
+
+    // Ensure methodSpecificPrompts exists
+    if (!settings.methodSpecificPrompts) {
+      settings.methodSpecificPrompts = defaultSettings.methodSpecificPrompts;
     }
 
     return settings;
@@ -1542,7 +1722,17 @@ HH:MM:SS - HH:MM:SS | [Concept/Heading]: [Brief explanation of what is discussed
 
 
   async saveSettings(settings) {
-    await chrome.storage.sync.set({ settings });
+    // Split settings to avoid quota issues
+    // Store prompts separately in local storage to avoid sync quota limits
+    const { prompts, ...syncSettings } = settings;
+    
+    // Save prompts to local storage (larger quota)
+    if (prompts) {
+      await chrome.storage.local.set({ prompts });
+    }
+    
+    // Save other settings to sync storage
+    await chrome.storage.sync.set({ settings: syncSettings });
   }
 
   async savePrompt(promptData) {
@@ -1579,7 +1769,7 @@ HH:MM:SS - HH:MM:SS | [Concept/Heading]: [Brief explanation of what is discussed
     const settings = await this.getSettings();
 
     // Don't allow deleting the default prompts
-    if (promptId === 'default' || promptId === 'full_brief' || promptId === 'longer_brief') {
+    if (promptId === 'default' || promptId === 'full_brief' || promptId === 'longer_brief' || promptId === 'detailed_walkthrough') {
       throw new Error('Cannot delete the default prompts');
     }
 
@@ -1613,8 +1803,39 @@ HH:MM:SS - HH:MM:SS | [Concept/Heading]: [Brief explanation of what is discussed
     // Set default settings on installation
     const settings = await this.getSettings();
     await this.saveSettings(settings);
+    
+    // Migrate existing prompts from sync to local storage
+    await this.migratePromptsToLocalStorage();
 
     console.log('YouTube AI Video Analyzer installed successfully');
+  }
+  
+  async migratePromptsToLocalStorage() {
+    try {
+      // Check if prompts are already in local storage
+      const localResult = await chrome.storage.local.get(['prompts']);
+      if (localResult.prompts && localResult.prompts.length > 0) {
+        console.log('Prompts already migrated to local storage');
+        return;
+      }
+      
+      // Get settings from sync storage (old format)
+      const syncResult = await chrome.storage.sync.get(['settings']);
+      if (syncResult.settings && syncResult.settings.prompts && syncResult.settings.prompts.length > 0) {
+        console.log('Migrating prompts from sync to local storage...');
+        
+        // Save prompts to local storage
+        await chrome.storage.local.set({ prompts: syncResult.settings.prompts });
+        
+        // Remove prompts from sync storage to save space
+        const { prompts, ...settingsWithoutPrompts } = syncResult.settings;
+        await chrome.storage.sync.set({ settings: settingsWithoutPrompts });
+        
+        console.log('Prompts migration completed successfully');
+      }
+    } catch (error) {
+      console.error('Error during prompts migration:', error);
+    }
   }
 }
 

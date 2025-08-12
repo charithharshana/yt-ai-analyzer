@@ -263,15 +263,20 @@ class YouTubeAnalyzer {
     button.className = 'yt-ai-analyzer-btn';
     button.innerHTML = `
       <div class="yt-ai-analyzer-btn-content">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        <svg class="play-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
         </svg>
         <span>AI Analyze</span>
-        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 10l5 5 5-5z"/>
-        </svg>
       </div>
       <div class="loading-progress"></div>
+    `;
+
+    const dropdownButton = document.createElement('button');
+    dropdownButton.className = 'yt-ai-analyzer-dropdown-btn';
+    dropdownButton.innerHTML = `
+      <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7 10l5 5 5-5z"/>
+      </svg>
     `;
 
     const dropdown = document.createElement('div');
@@ -295,13 +300,39 @@ class YouTubeAnalyzer {
           <div class="method-desc">Send video URL directly to AI</div>
         </div>
       </div>
+      <div class="method-option" data-method="transcriptlink">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+        </svg>
+        <div class="method-info">
+          <div class="method-title">Transcript + Link</div>
+          <div class="method-desc">Combine transcript and video URL</div>
+        </div>
+      </div>
     `;
 
     container.appendChild(button);
+    container.appendChild(dropdownButton);
     container.appendChild(dropdown);
 
-    // Handle button click to show dropdown
-    button.addEventListener('click', (e) => {
+    // Handle main button click - analyze with default method
+    button.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (button.classList.contains('loading')) return;
+      
+      // Get default method from settings
+      try {
+        const response = await chrome.runtime.sendMessage({ action: 'getSettings' });
+        const defaultMethod = response.success && response.settings.defaultAnalysisMethod ? response.settings.defaultAnalysisMethod : 'transcript';
+        this.handleAnalyzeClick(defaultMethod);
+      } catch (error) {
+        console.error('Error getting default method:', error);
+        this.handleAnalyzeClick('transcript'); // fallback to transcript
+      }
+    });
+
+    // Handle dropdown button click to show dropdown
+    dropdownButton.addEventListener('click', (e) => {
       e.stopPropagation();
       if (button.classList.contains('loading')) return;
       
@@ -326,6 +357,7 @@ class YouTubeAnalyzer {
     });
 
     this.analyzeButton = button;
+    this.dropdownButton = dropdownButton;
     this.analyzeContainer = container;
     return container;
   }
@@ -441,6 +473,63 @@ class YouTubeAnalyzer {
         } else {
           throw new Error(response.error || 'Analysis failed');
         }
+      } else if (method === 'transcriptlink') {
+        // New transcript + link method
+        if (buttonContent) {
+          buttonContent.innerHTML = `
+            <div class="loading-spinner"></div>
+            <span>Extracting transcript...</span>
+          `;
+        }
+
+        console.log('Using transcript + link method...');
+        this.showChatMessage('🤖 AI Assistant', 'Extracting transcript and preparing video URL for comprehensive analysis...', 'assistant');
+
+        // Update button text to show progress
+        if (buttonContent) {
+          buttonContent.innerHTML = `
+            <div class="loading-spinner"></div>
+            <span>Opening transcript panel...</span>
+          `;
+        }
+
+        const transcriptData = await this.extractTranscriptFromPanel();
+
+        // Update progress during extraction
+        if (buttonContent) {
+          buttonContent.innerHTML = `
+            <div class="loading-spinner"></div>
+            <span>Extracting complete transcript...</span>
+          `;
+        }
+
+        console.log('Transcript extraction result:', transcriptData);
+        this.showChatMessage('🤖 AI Assistant', 'Transcript extracted! Analyzing with both transcript and video URL...', 'assistant');
+
+        // Update button text to show analysis in progress
+        if (buttonContent) {
+          buttonContent.innerHTML = `
+            <div class="loading-spinner"></div>
+            <span>Analyzing...</span>
+          `;
+        }
+
+        // Send message to background script for transcript + link analysis
+        const response = await chrome.runtime.sendMessage({
+          action: 'analyzeVideoTranscriptLink',
+          videoId: videoId,
+          videoUrl: window.location.href,
+          transcriptData: transcriptData,
+          videoTitle: videoTitle,
+          videoDescription: videoDescription,
+          method: 'transcriptlink'
+        });
+
+        if (response.success) {
+          this.displayAnalysisInChat(response.analysis);
+        } else {
+          throw new Error(response.error || 'Analysis failed');
+        }
       }
 
       // Reset button after a short delay
@@ -471,13 +560,10 @@ class YouTubeAnalyzer {
       const buttonContent = this.analyzeButton.querySelector('.yt-ai-analyzer-btn-content');
       if (buttonContent) {
         buttonContent.innerHTML = `
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          <svg class="play-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
           </svg>
           <span>AI Analyze</span>
-          <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M7 10l5 5 5-5z"/>
-          </svg>
         `;
       }
     }
@@ -1276,6 +1362,26 @@ class YouTubeAnalyzer {
         </div>
       </div>
       <div class="yt-ai-chat-input-container" id="yt-ai-chat-input-container" style="display: none;">
+        <!-- Saved Prompts Section -->
+        <div class="yt-ai-saved-prompts" id="yt-ai-saved-prompts">
+          <div class="yt-ai-saved-prompts-header">
+            <button id="yt-ai-toggle-prompts-btn" class="yt-ai-toggle-prompts-btn" title="Toggle Quick Prompts">
+              <svg class="yt-ai-chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+              <span class="yt-ai-saved-prompts-title">Quick Prompts</span>
+            </button>
+            <button id="yt-ai-manage-prompts-btn" class="yt-ai-manage-prompts-btn" title="Manage saved prompts">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11.03L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11.03C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="yt-ai-saved-prompts-list" id="yt-ai-saved-prompts-list" style="display: none;">
+            <!-- Saved prompts will be populated here -->
+          </div>
+        </div>
+        
         <div class="yt-ai-chat-input-wrapper">
           <input type="text"
                  id="yt-ai-chat-input"
@@ -1509,6 +1615,7 @@ class YouTubeAnalyzer {
   setupChatInput(popup) {
     const chatInput = popup.querySelector('#yt-ai-chat-input');
     const sendBtn = popup.querySelector('#yt-ai-send-btn');
+    const managePromptsBtn = popup.querySelector('#yt-ai-manage-prompts-btn');
 
     if (!chatInput || !sendBtn) return;
 
@@ -1533,6 +1640,24 @@ class YouTubeAnalyzer {
     chatInput.addEventListener('blur', () => {
       chatInput.parentElement.classList.remove('focused');
     });
+
+    // Handle manage prompts button click
+    if (managePromptsBtn) {
+      managePromptsBtn.addEventListener('click', () => {
+        this.openSavedPromptsManager();
+      });
+    }
+
+    // Handle toggle prompts button click
+    const togglePromptsBtn = popup.querySelector('#yt-ai-toggle-prompts-btn');
+    if (togglePromptsBtn) {
+      togglePromptsBtn.addEventListener('click', () => {
+        this.toggleSavedPrompts();
+      });
+    }
+
+    // Load and display saved prompts
+    this.loadSavedPrompts();
   }
 
   /**
@@ -1776,6 +1901,238 @@ class YouTubeAnalyzer {
         'sw': 'sw-resize'
       };
       return cursors[direction] || 'default';
+    }
+  }
+
+  /**
+   * Load and display saved prompts
+   */
+  async loadSavedPrompts() {
+    try {
+      const result = await chrome.storage.local.get(['savedChatPrompts']);
+      const savedPrompts = result.savedChatPrompts || this.getDefaultChatPrompts();
+      
+      // Save default prompts if none exist
+      if (!result.savedChatPrompts) {
+        await chrome.storage.local.set({ savedChatPrompts: savedPrompts });
+      }
+      
+      this.displaySavedPrompts(savedPrompts);
+    } catch (error) {
+      console.error('Error loading saved prompts:', error);
+      // Fallback to default prompts
+      this.displaySavedPrompts(this.getDefaultChatPrompts());
+    }
+  }
+
+  /**
+   * Get default chat prompts
+   */
+  getDefaultChatPrompts() {
+    return [
+      "What are the main points of this video?",
+      "Can you summarize this in 3 key takeaways?",
+      "What questions does this video answer?",
+      "Are there any important timestamps I should know?",
+      "What's the most valuable insight from this video?"
+    ];
+  }
+
+  /**
+   * Display saved prompts in the UI
+   */
+  displaySavedPrompts(prompts) {
+    const promptsList = document.getElementById('yt-ai-saved-prompts-list');
+    if (!promptsList) return;
+
+    promptsList.innerHTML = '';
+
+    prompts.forEach((prompt, index) => {
+      const promptChip = document.createElement('button');
+      promptChip.className = 'yt-ai-prompt-chip';
+      promptChip.textContent = prompt;
+      promptChip.title = prompt; // Show full text on hover
+      
+      promptChip.addEventListener('click', () => {
+        this.insertPromptToChat(prompt);
+      });
+
+      promptsList.appendChild(promptChip);
+    });
+  }
+
+  /**
+   * Insert prompt into chat input
+   */
+  insertPromptToChat(prompt) {
+    const chatInput = document.getElementById('yt-ai-chat-input');
+    if (!chatInput) return;
+
+    chatInput.value = prompt;
+    chatInput.focus();
+    
+    // Trigger input event for any listeners
+    chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  /**
+   * Open saved prompts manager
+   */
+  openSavedPromptsManager() {
+    this.createSavedPromptsModal();
+  }
+
+  /**
+   * Create and show saved prompts management modal
+   */
+  async createSavedPromptsModal() {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('yt-ai-saved-prompts-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    const result = await chrome.storage.local.get(['savedChatPrompts']);
+    const savedPrompts = result.savedChatPrompts || this.getDefaultChatPrompts();
+
+    const modal = document.createElement('div');
+    modal.id = 'yt-ai-saved-prompts-modal';
+    modal.className = 'yt-ai-modal';
+    modal.innerHTML = `
+      <div class="yt-ai-modal-content">
+        <div class="yt-ai-modal-header">
+          <h3>Manage Quick Prompts</h3>
+          <button class="yt-ai-modal-close" id="yt-ai-close-prompts-modal">&times;</button>
+        </div>
+        <div class="yt-ai-modal-body">
+          <div class="yt-ai-prompts-manager">
+            <div class="yt-ai-add-prompt-section">
+              <input type="text" id="yt-ai-new-prompt-input" placeholder="Enter a new prompt..." maxlength="200">
+              <button id="yt-ai-add-prompt-btn" class="yt-ai-btn-primary">Add Prompt</button>
+            </div>
+            <div class="yt-ai-prompts-list" id="yt-ai-manage-prompts-list">
+              <!-- Prompts will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Populate prompts list
+    this.populatePromptsManager(savedPrompts);
+
+    // Add event listeners
+    this.setupPromptsManagerEvents(modal, savedPrompts);
+
+    // Show modal
+    modal.style.display = 'flex';
+  }
+
+  /**
+   * Populate prompts manager with current prompts
+   */
+  populatePromptsManager(prompts) {
+    const promptsList = document.getElementById('yt-ai-manage-prompts-list');
+    if (!promptsList) return;
+
+    promptsList.innerHTML = '';
+
+    prompts.forEach((prompt, index) => {
+      const promptItem = document.createElement('div');
+      promptItem.className = 'yt-ai-prompt-item';
+      promptItem.innerHTML = `
+        <span class="yt-ai-prompt-text">${prompt}</span>
+        <div class="yt-ai-prompt-actions">
+          <button class="yt-ai-btn-edit" data-index="${index}">Edit</button>
+          <button class="yt-ai-btn-delete" data-index="${index}">Delete</button>
+        </div>
+      `;
+      promptsList.appendChild(promptItem);
+    });
+  }
+
+  /**
+   * Setup event listeners for prompts manager
+   */
+  setupPromptsManagerEvents(modal, prompts) {
+    const closeBtn = modal.querySelector('#yt-ai-close-prompts-modal');
+    const addBtn = modal.querySelector('#yt-ai-add-prompt-btn');
+    const newPromptInput = modal.querySelector('#yt-ai-new-prompt-input');
+    const promptsList = modal.querySelector('#yt-ai-manage-prompts-list');
+
+    // Close modal
+    closeBtn.addEventListener('click', () => {
+      modal.remove();
+    });
+
+    // Close on outside click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+
+    // Add new prompt
+    const addPrompt = async () => {
+      const newPrompt = newPromptInput.value.trim();
+      if (!newPrompt) return;
+
+      prompts.push(newPrompt);
+      await chrome.storage.local.set({ savedChatPrompts: prompts });
+      
+      newPromptInput.value = '';
+      this.populatePromptsManager(prompts);
+      this.loadSavedPrompts(); // Refresh the main UI
+    };
+
+    addBtn.addEventListener('click', addPrompt);
+    newPromptInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        addPrompt();
+      }
+    });
+
+    // Handle edit and delete buttons
+    promptsList.addEventListener('click', async (e) => {
+      const index = parseInt(e.target.dataset.index);
+      if (isNaN(index)) return;
+
+      if (e.target.classList.contains('yt-ai-btn-edit')) {
+        const newText = prompt('Edit prompt:', prompts[index]);
+        if (newText && newText.trim()) {
+          prompts[index] = newText.trim();
+          await chrome.storage.local.set({ savedChatPrompts: prompts });
+          this.populatePromptsManager(prompts);
+          this.loadSavedPrompts(); // Refresh the main UI
+        }
+      } else if (e.target.classList.contains('yt-ai-btn-delete')) {
+        if (confirm('Are you sure you want to delete this prompt?')) {
+          prompts.splice(index, 1);
+          await chrome.storage.local.set({ savedChatPrompts: prompts });
+          this.populatePromptsManager(prompts);
+          this.loadSavedPrompts(); // Refresh the main UI
+        }
+      }
+    });
+  }
+
+  // Toggle the visibility of saved prompts list
+  toggleSavedPrompts() {
+    const promptsList = document.getElementById('yt-ai-saved-prompts-list');
+    const chevronIcon = document.querySelector('.yt-ai-chevron-icon');
+    
+    if (!promptsList || !chevronIcon) return;
+    
+    const isVisible = promptsList.style.display !== 'none';
+    
+    if (isVisible) {
+      promptsList.style.display = 'none';
+      chevronIcon.style.transform = 'rotate(-90deg)';
+    } else {
+      promptsList.style.display = 'block';
+      chevronIcon.style.transform = 'rotate(0deg)';
     }
   }
 }

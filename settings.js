@@ -73,6 +73,10 @@ class SettingsManager {
       this.validateForm();
     });
 
+    document.getElementById('defaultAnalysisMethod').addEventListener('change', () => {
+      this.validateForm();
+    });
+
 
 
     // Modal event listeners
@@ -149,8 +153,12 @@ class SettingsManager {
     document.getElementById('geminiApiKeysTextarea').value = geminiApiKeys.join('\n');
 
     // Advanced options
+    document.getElementById('defaultAnalysisMethod').value = this.currentSettings.defaultAnalysisMethod || 'transcript';
     document.getElementById('autoAnalyze').checked = this.currentSettings.autoAnalyze || false;
     document.getElementById('openVideoInNewTab').checked = this.currentSettings.openVideoInNewTab !== false; // Default to true
+
+    // Method-specific prompts
+    this.populateMethodSpecificPrompts();
 
     this.updateKeyCount();
     this.validateForm();
@@ -264,15 +272,24 @@ class SettingsManager {
       .map(key => key.trim())
       .filter(key => key.length > 0);
 
+    // Get method-specific prompt settings
+    const methodSpecificPrompts = {
+      transcript: document.getElementById('transcriptMethodPrompt')?.value || 'full_brief',
+      videolink: document.getElementById('videolinkMethodPrompt')?.value || 'full_brief',
+      transcriptlink: document.getElementById('transcriptlinkMethodPrompt')?.value || 'full_brief'
+    };
+
     return {
       selectedModel: document.getElementById('modelSelect').value,
       geminiApiKeys: geminiApiKeys,
       apiKeys: geminiApiKeys, // Keep for backward compatibility
+      defaultAnalysisMethod: document.getElementById('defaultAnalysisMethod').value,
       autoAnalyze: document.getElementById('autoAnalyze').checked,
       openVideoInNewTab: document.getElementById('openVideoInNewTab').checked,
       selectedPromptId: this.selectedPromptId,
       prompts: this.currentPrompts,
-      availableModels: this.currentModels || this.getDefaultModels()
+      availableModels: this.currentModels || this.getDefaultModels(),
+      methodSpecificPrompts: methodSpecificPrompts
     };
   }
 
@@ -461,6 +478,34 @@ class SettingsManager {
     });
   }
 
+  populateMethodSpecificPrompts() {
+    const methodPrompts = this.currentSettings.methodSpecificPrompts || {
+      transcript: 'full_brief',
+      videolink: 'full_brief',
+      transcriptlink: 'full_brief'
+    };
+
+    // Populate each method-specific prompt dropdown
+    const methods = ['transcript', 'videolink', 'transcriptlink'];
+    methods.forEach(method => {
+      const selectId = `${method}MethodPrompt`;
+      const selectElement = document.getElementById(selectId);
+      if (selectElement) {
+        selectElement.innerHTML = '';
+        
+        this.currentPrompts.forEach(prompt => {
+          const option = document.createElement('option');
+          option.value = prompt.id;
+          option.textContent = prompt.name;
+          if (prompt.id === methodPrompts[method]) {
+            option.selected = true;
+          }
+          selectElement.appendChild(option);
+        });
+      }
+    });
+  }
+
   updatePromptList() {
     const promptList = document.getElementById('promptList');
     promptList.innerHTML = '';
@@ -470,7 +515,7 @@ class SettingsManager {
       return;
     }
 
-    // Sort prompts to ensure "Full Video Brief" comes first, then "Longer Video Brief", then "Default Analysis Prompt", then others
+    // Sort prompts to ensure "Full Video Brief" comes first, then "Longer Video Brief", then "Default Analysis Prompt", then "Detailed Video Walkthrough", then others
     const sortedPrompts = [...this.currentPrompts].sort((a, b) => {
       if (a.id === 'full_brief') return -1;
       if (b.id === 'full_brief') return 1;
@@ -478,6 +523,8 @@ class SettingsManager {
       if (b.id === 'longer_brief') return 1;
       if (a.id === 'default') return -1;
       if (b.id === 'default') return 1;
+      if (a.id === 'detailed_walkthrough') return -1;
+      if (b.id === 'detailed_walkthrough') return 1;
       return (a.name || '').localeCompare(b.name || '');
     });
 
@@ -494,7 +541,7 @@ class SettingsManager {
         </div>
         <div class="prompt-actions">
           <button type="button" class="btn btn-outline btn-small edit-prompt-btn" data-prompt-id="${prompt.id}">Edit</button>
-          ${prompt.id !== 'default' && prompt.id !== 'full_brief' && prompt.id !== 'longer_brief' ? `
+          ${prompt.id !== 'default' && prompt.id !== 'full_brief' && prompt.id !== 'longer_brief' && prompt.id !== 'detailed_walkthrough' ? `
             <button type="button" class="btn btn-outline btn-small delete-prompt-btn" data-prompt-id="${prompt.id}">Delete</button>
           ` : ''}
           ${prompt.id !== this.selectedPromptId ? `
@@ -508,6 +555,9 @@ class SettingsManager {
 
     // Add event listeners for the buttons
     this.setupPromptListEventListeners();
+    
+    // Update method-specific prompt dropdowns
+    this.populateMethodSpecificPrompts();
   }
 
   setupPromptListEventListeners() {
@@ -599,7 +649,7 @@ class SettingsManager {
   }
 
   async deletePrompt(promptId) {
-    if (promptId === 'default' || promptId === 'full_brief' || promptId === 'longer_brief') {
+    if (promptId === 'default' || promptId === 'full_brief' || promptId === 'longer_brief' || promptId === 'detailed_walkthrough') {
       this.showError('Cannot delete the default prompts');
       return;
     }

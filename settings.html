@@ -183,6 +183,16 @@
                     <p class="section-description">Fine-tune the analyzer behavior</p>
 
                     <div class="form-group">
+                        <label for="defaultAnalysisMethod">Default Analysis Method:</label>
+                        <select id="defaultAnalysisMethod" class="form-control">
+                            <option value="transcript">Transcript Method</option>
+                            <option value="videolink">Video Link Method</option>
+                            <option value="transcriptlink">Transcript + Link</option>
+                        </select>
+                        <small class="help-text">Choose the default method when clicking the main AI Analyze button. Use the dropdown arrow to access other methods.</small>
+                    </div>
+
+                    <div class="form-group">
                         <div class="checkbox-group">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="autoAnalyze" class="checkbox">
@@ -204,6 +214,42 @@
                         <small class="help-text">When using the Quick Analyze button on YouTube home page, open videos in a new tab instead of current tab</small>
                     </div>
 
+
+                </div>
+
+                <!-- Method-Specific Prompts -->
+                <div class="setting-section">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                        </svg>
+                        Method-Specific Prompts
+                    </h2>
+                    <p class="section-description">Configure different prompts for each analysis method</p>
+
+                    <div class="form-group">
+                        <label for="transcriptMethodPrompt">Transcript Method Prompt:</label>
+                        <select id="transcriptMethodPrompt" class="form-control">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <small class="help-text">Prompt used when analyzing with transcript only</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videolinkMethodPrompt">Video Link Method Prompt:</label>
+                        <select id="videolinkMethodPrompt" class="form-control">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <small class="help-text">Prompt used when analyzing with video URL only</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transcriptlinkMethodPrompt">Transcript + Link Method Prompt:</label>
+                        <select id="transcriptlinkMethodPrompt" class="form-control">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <small class="help-text">Prompt used when analyzing with both transcript and video URL</small>
+                    </div>
 
                 </div>
 

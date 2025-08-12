@@ -1,14 +1,14 @@
 /* Styles for YouTube AI Analyzer container and button */
 .yt-ai-analyzer-container {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
   margin-left: 12px;
   margin-right: 8px;
 }
 .yt-ai-analyzer-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
-  border-radius: 18px;
+  border-radius: 18px 0 0 18px;
   color: white;
   cursor: pointer;
   font-family: "YouTube Sans", "Roboto", sans-serif;
@@ -20,11 +20,30 @@
   display: inline-flex;
   align-items: center;
   height: 36px;
-  min-width: 140px;
-  max-width: 200px;
+  min-width: 120px;
+  max-width: 180px;
   position: relative;
   overflow: visible;
   white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.yt-ai-analyzer-dropdown-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0 18px 18px 0;
+  color: white;
+  cursor: pointer;
+  padding: 8px 10px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 32px;
+  position: relative;
   z-index: 10;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
 }
@@ -38,6 +57,22 @@
 .yt-ai-analyzer-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+}
+
+.yt-ai-analyzer-dropdown-btn:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.yt-ai-analyzer-dropdown-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+}
+
+.yt-ai-analyzer-container:hover .yt-ai-analyzer-btn,
+.yt-ai-analyzer-container:hover .yt-ai-analyzer-dropdown-btn {
+  transform: translateY(-1px);
 }
 
 .yt-ai-analyzer-btn-content {
@@ -57,10 +92,9 @@
   opacity: 0.9;
 }
 
-.yt-ai-analyzer-btn .dropdown-arrow {
+.yt-ai-analyzer-dropdown-btn .dropdown-arrow {
   width: 12px;
   height: 12px;
-  margin-left: 4px;
   opacity: 0.8;
   transition: transform 0.2s ease;
 }
@@ -69,8 +103,13 @@
   opacity: 1;
 }
 
-
 .yt-ai-analyzer-btn.loading {
+  pointer-events: none;
+  opacity: 0.8;
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.yt-ai-analyzer-btn.loading + .yt-ai-analyzer-dropdown-btn {
   pointer-events: none;
   opacity: 0.8;
   background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
@@ -566,8 +605,124 @@
 /* Chat Input Styles */
 .yt-ai-chat-input-container {
   border-top: 1px solid #e0e0e0;
-  padding: 12px 16px;
   background: #f8f9fa;
+}
+
+/* Saved Prompts Styles */
+.yt-ai-saved-prompts {
+  padding: 12px 16px 8px 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.yt-ai-saved-prompts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.yt-ai-toggle-prompts-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 0;
+  font-family: "YouTube Sans", "Roboto", sans-serif;
+  transition: all 0.2s ease;
+}
+
+.yt-ai-toggle-prompts-btn:hover {
+  opacity: 0.7;
+}
+
+.yt-ai-chevron-icon {
+  transition: transform 0.2s ease;
+  transform: rotate(-90deg);
+  color: #666;
+}
+
+.yt-ai-saved-prompts-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.yt-ai-manage-prompts-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yt-ai-manage-prompts-btn:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.yt-ai-saved-prompts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.yt-ai-prompt-chip {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: "YouTube Sans", "Roboto", sans-serif;
+}
+
+.yt-ai-prompt-chip:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.yt-ai-prompt-chip:active {
+  transform: translateY(0);
+}
+
+.yt-ai-saved-prompts-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.yt-ai-saved-prompts-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.yt-ai-saved-prompts-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.yt-ai-saved-prompts-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.yt-ai-chat-input-wrapper {
+  padding: 12px 16px;
 }
 
 .yt-ai-chat-popup.minimized .yt-ai-chat-input-container {
@@ -656,6 +811,208 @@
 
 .yt-ai-message.user .yt-ai-message-text {
   color: white;
+}
+
+/* Modal Styles for Saved Prompts Manager */
+.yt-ai-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  font-family: "YouTube Sans", "Roboto", sans-serif;
+}
+
+.yt-ai-modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.yt-ai-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+
+.yt-ai-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.yt-ai-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.yt-ai-modal-close:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.yt-ai-modal-body {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.yt-ai-prompts-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.yt-ai-add-prompt-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.yt-ai-add-prompt-section input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: "YouTube Sans", "Roboto", sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.yt-ai-add-prompt-section input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.yt-ai-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "YouTube Sans", "Roboto", sans-serif;
+}
+
+.yt-ai-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.yt-ai-prompts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.yt-ai-prompt-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.yt-ai-prompt-item:hover {
+  background: #f0f0f0;
+  border-color: #d0d0d0;
+}
+
+.yt-ai-prompt-text {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+  margin-right: 12px;
+  word-break: break-word;
+}
+
+.yt-ai-prompt-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.yt-ai-btn-edit,
+.yt-ai-btn-delete {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "YouTube Sans", "Roboto", sans-serif;
+}
+
+.yt-ai-btn-edit {
+  color: #667eea;
+  border-color: #667eea;
+}
+
+.yt-ai-btn-edit:hover {
+  background: #667eea;
+  color: white;
+}
+
+.yt-ai-btn-delete {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.yt-ai-btn-delete:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.yt-ai-prompts-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.yt-ai-prompts-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.yt-ai-prompts-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.yt-ai-prompts-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* Resize handles for chat popup */

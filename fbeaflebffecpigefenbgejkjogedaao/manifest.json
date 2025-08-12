@@ -1,0 +1,48 @@
+{
+"update_url": "https://clients2.google.com/service/update2/crx",
+
+  "manifest_version": 3,
+
+  "name": "Controls for YouTube",
+  "version": "1.2.3",
+
+  "description": "Add configurable keyboard shortcuts and customizations to the YouTube player.",
+
+  "host_permissions": ["https://youtube.com/*", "https://www.youtube.com/*", "https://content-youtube.googleapis.com/*"],
+
+  "action": {
+    "default_icon": {
+      "128": "icon-128.png",
+      "96": "icon-96.png",
+      "48": "icon-48.png",
+      "16": "icon-16.png"
+    }
+  },
+
+  "icons": {
+    "128": "icon-128.png",
+    "96": "icon-96.png",
+    "48": "icon-48.png",
+    "16": "icon-16.png"
+  },
+
+  "content_scripts": [
+      {
+          "matches": ["https://youtube.com/*", "https://www.youtube.com/*", "https://content-youtube.googleapis.com/*"],
+          "js": ["js/vendor.js", "js/content-script.js"]
+      }
+  ],
+
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+
+  "background": {
+    "service_worker": "js/background.js"
+  },
+
+  "permissions": [
+    "storage", "tabs", "activeTab", "scripting"
+  ]
+}
